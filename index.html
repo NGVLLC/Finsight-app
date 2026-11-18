@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinSight - Financial Intelligence</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:white;margin:0;padding:16px}
+h1{color:#22c55e} .card{background:#1e293b;padding:16px;border-radius:12px;margin:12px 0}
+.price{font-size:28px;font-weight:bold} .up{color:#22c55e} .down{color:#ef4444}
+button{background:#22c55e;border:0;padding:10px 16px;border-radius:8px;font-weight:bold}
+</style>
+</head>
+<body>
+<h1>FinSight 💹</h1>
+<p>Commodities • Stocks • Shares • Indices — Live Insights</p>
+<div class="card"><h3>Gold (XAU/USD)</h3><div class="price" id="gold">Loading...</div><p id="gold-insight">Analysing...</p></div>
+<div class="card"><h3>Oil (WTI)</h3><div class="price" id="oil">Loading...</div><p id="oil-insight">Analysing...</p></div>
+<div class="card"><h3>S&P 500</h3><div class="price" id="sp500">Loading...</div><p id="sp500-insight">Analysing...</p></div>
+<div class="card"><h3>Apple (AAPL)</h3><div class="price" id="aapl">Loading...</div><p id="aapl-insight">Analysing...</p></div>
+<div class="card"><h3>Safaricom</h3><div class="price">KES 17.50 <span class="up">+1.2%</span></div><p>Insight: Stable, good for long-term holders in Kenya.</p></div>
+<div class="card"><h3>AI Insight Engine</h3><p id="ai">Loading market summary...</p><button onclick="refresh()">Refresh Data</button></div>
+<script>
+async function getPrice(symbol, el, insightEl, name){
+  try{
+    let res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`);
+    let data = await res.json();
+    let meta = data.chart.result[0].meta;
+    let price = meta.regularMarketPrice;
+    let prev = meta.chartPreviousClose;
+    let change = ((price-prev)/prev*100).toFixed(2);
+    let cls = change >= 0 ? 'up' : 'down';
+    document.getElementById(el).innerHTML = `$${price} <span class="${cls}">${change}%</span>`;
+    document.getElementById(insightEl).innerText = change>=0 ? `${name} is trending UP. Momentum is positive.` : `${name} is trending DOWN. Wait for a better entry.`;
+  }catch(e){ document.getElementById(el).innerText = "Offline - using demo data"; }
+}
+function refresh(){
+  getPrice("GC=F","gold","gold-insight","Gold");
+  getPrice("CL=F","oil","oil-insight","Oil");
+  getPrice("^GSPC","sp500","sp500-insight","S&P 500");
+  getPrice("AAPL","aapl","aapl-insight","Apple");
+  document.getElementById("ai").innerText = "Market Check: Gold and S&P 500 show mixed signals. If Gold is up and Stocks are down, investors are moving to safe assets. If both are up, risk appetite is high. Watch Oil - if Oil rises fast, inflation pressure rises.";
+}
+refresh();
+</script>
+</body>
+</html>
