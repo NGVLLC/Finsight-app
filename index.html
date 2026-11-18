@@ -8,12 +8,14 @@
 body{font-family:Arial;background:#0f172a;color:white;margin:0;padding:16px}
 h1{color:#22c55e} .card{background:#1e293b;padding:16px;border-radius:12px;margin:12px 0}
 .price{font-size:28px;font-weight:bold} .up{color:#22c55e} .down{color:#ef4444}
-button{background:#22c55e;border:0;padding:10px 16px;border-radius:8px;font-weight:bold}
+button{background:#22c55e;border:0;padding:10px 16px;border-radius:8px;font-weight:bold;color:#000}
+small{color:#94a3b8}
 </style>
 </head>
 <body>
 <h1>FinSight 💹</h1>
 <p>Commodities • Stocks • Shares • Indices — Live Insights</p>
+<p><small id="updated">Updating...</small></p>
 <div class="card"><h3>Gold (XAU/USD)</h3><div class="price" id="gold">Loading...</div><p id="gold-insight">Analysing...</p></div>
 <div class="card"><h3>Oil (WTI)</h3><div class="price" id="oil">Loading...</div><p id="oil-insight">Analysing...</p></div>
 <div class="card"><h3>S&P 500</h3><div class="price" id="sp500">Loading...</div><p id="sp500-insight">Analysing...</p></div>
@@ -23,25 +25,39 @@ button{background:#22c55e;border:0;padding:10px 16px;border-radius:8px;font-weig
 <script>
 async function getPrice(symbol, el, insightEl, name){
   try{
-    let res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`);
+    let yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`;
+    let res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`);
     let data = await res.json();
     let meta = data.chart.result[0].meta;
     let price = meta.regularMarketPrice;
     let prev = meta.chartPreviousClose;
     let change = ((price-prev)/prev*100).toFixed(2);
     let cls = change >= 0 ? 'up' : 'down';
-    document.getElementById(el).innerHTML = `$${price} <span class="${cls}">${change}%</span>`;
+    document.getElementById(el).innerHTML = `$${price.toLocaleString()} <span class="${cls}">${change}%</span>`;
     document.getElementById(insightEl).innerText = change>=0 ? `${name} is trending UP. Momentum is positive.` : `${name} is trending DOWN. Wait for a better entry.`;
-  }catch(e){ document.getElementById(el).innerText = "Offline - using demo data"; }
+    return parseFloat(change);
+  }catch(e){
+    document.getElementById(el).innerText = "Retrying...";
+    return 0;
+  }
 }
-function refresh(){
-  getPrice("GC=F","gold","gold-insight","Gold");
-  getPrice("CL=F","oil","oil-insight","Oil");
-  getPrice("^GSPC","sp500","sp500-insight","S&P 500");
-  getPrice("AAPL","aapl","aapl-insight","Apple");
-  document.getElementById("ai").innerText = "Market Check: Gold and S&P 500 show mixed signals. If Gold is up and Stocks are down, investors are moving to safe assets. If both are up, risk appetite is high. Watch Oil - if Oil rises fast, inflation pressure rises.";
+async function refresh(){
+  document.getElementById("updated").innerText = "Updating live prices...";
+  let g = await getPrice("GC=F","gold","gold-insight","Gold");
+  let o = await getPrice("CL=F","oil","oil-insight","Oil");
+  let s = await getPrice("^GSPC","sp500","sp500-insight","S&P 500");
+  let a = await getPrice("AAPL","aapl","aapl-insight","Apple");
+  document.getElementById("updated").innerText = "Last updated: " + new Date().toLocaleTimeString();
+  let msg = "Market Check: ";
+  if(g>0 && s>0) msg += "Gold and Stocks both UP - Risk appetite is HIGH, investors are confident.";
+  else if(g>0 && s<0) msg += "Gold UP, Stocks DOWN - Investors moving to safe assets. Be careful.";
+  else if(g<0 && s>0) msg += "Gold DOWN, Stocks UP - Money moving into stocks. Growth mood.";
+  else msg += "Mixed signals. Wait before making big moves.";
+  if(o>1) msg += " Oil rising fast - inflation pressure up.";
+  document.getElementById("ai").innerText = msg;
 }
 refresh();
+setInterval(refresh, 60000);
 </script>
 </body>
 </html>
