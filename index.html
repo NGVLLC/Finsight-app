@@ -23,17 +23,18 @@ small{color:#94a3b8}
 <div class="card"><h3>Safaricom</h3><div class="price">KES 17.50 <span class="up">+1.2%</span></div><p>Insight: Stable, good for long-term holders in Kenya.</p></div>
 <div class="card"><h3>AI Insight Engine</h3><p id="ai">Loading market summary...</p><button onclick="refresh()">Refresh Data</button></div>
 <script>
-async function getPrice(symbol, el, insightEl, name){
+async function getPrice(stooqSym, el, insightEl, name){
   try{
-    let yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`;
-    let res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`);
-    let data = await res.json();
-    let meta = data.chart.result[0].meta;
-    let price = meta.regularMarketPrice;
-    let prev = meta.chartPreviousClose;
-    let change = ((price-prev)/prev*100).toFixed(2);
+    let stooqUrl = `https://stooq.com/q/l/?s=${stooqSym}&f=sd2t2ohlcv&h&e=csv`;
+    let res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(stooqUrl)}`);
+    let text = await res.text();
+    let lines = text.trim().split("\n");
+    let cols = lines[1].split(",");
+    let open = parseFloat(cols[3]);
+    let close = parseFloat(cols[6]);
+    let change = ((close-open)/open*100).toFixed(2);
     let cls = change >= 0 ? 'up' : 'down';
-    document.getElementById(el).innerHTML = `$${price.toLocaleString()} <span class="${cls}">${change}%</span>`;
+    document.getElementById(el).innerHTML = `$${close.toLocaleString()} <span class="${cls}">${change}%</span>`;
     document.getElementById(insightEl).innerText = change>=0 ? `${name} is trending UP. Momentum is positive.` : `${name} is trending DOWN. Wait for a better entry.`;
     return parseFloat(change);
   }catch(e){
@@ -43,10 +44,10 @@ async function getPrice(symbol, el, insightEl, name){
 }
 async function refresh(){
   document.getElementById("updated").innerText = "Updating live prices...";
-  let g = await getPrice("GC=F","gold","gold-insight","Gold");
-  let o = await getPrice("CL=F","oil","oil-insight","Oil");
-  let s = await getPrice("^GSPC","sp500","sp500-insight","S&P 500");
-  let a = await getPrice("AAPL","aapl","aapl-insight","Apple");
+  let g = await getPrice("gc.f","gold","gold-insight","Gold");
+  let o = await getPrice("cl.f","oil","oil-insight","Oil");
+  let s = await getPrice("^spx","sp500","sp500-insight","S&P 500");
+  let a = await getPrice("aapl.us","aapl","aapl-insight","Apple");
   document.getElementById("updated").innerText = "Last updated: " + new Date().toLocaleTimeString();
   let msg = "Market Check: ";
   if(g>0 && s>0) msg += "Gold and Stocks both UP - Risk appetite is HIGH, investors are confident.";
