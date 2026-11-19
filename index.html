@@ -3,142 +3,164 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinSight - Massive Live Finance</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>FinSight - TradingView Live</title>
+<script src="https://s3.tradingview.com/tv.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#0a0e17;color:white;padding:15px}
-.header{text-align:center;padding:20px 0}
+body{background:#0a0e17;color:white;padding:0}
+.header{text-align:center;padding:20px 15px 10px}
 .header h1{font-size:32px;color:#00ff88}
 .header p{color:#888;margin-top:5px}
-.search-box{background:#151a26;padding:20px;border-radius:15px;display:flex;gap:10px;margin:15px 0;flex-wrap:wrap}
+.search-box{background:#151a26;padding:15px;border-radius:15px;display:flex;gap:10px;margin:15px;flex-wrap:wrap}
 .search-box input{flex:1;padding:14px;border:none;border-radius:10px;background:#0a0e17;color:white;font-size:16px;outline:none;min-width:200px}
 .search-box button{padding:14px 25px;background:#00ff88;color:black;border:none;border-radius:10px;font-weight:bold;cursor:pointer;font-size:16px}
-.quick{margin:10px 0;display:flex;gap:8px;flex-wrap:wrap}
+.quick{margin:10px 15px;display:flex;gap:8px;flex-wrap:wrap}
 .quick button{padding:8px 14px;background:#1e2536;color:white;border:1px solid #333;border-radius:20px;cursor:pointer}
 .quick button:hover{background:#00ff88;color:black}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:15px 0}
-.card{background:#151a26;padding:18px;border-radius:15px;border:1px solid #222}
-.card h3{font-size:13px;color:#888}
-.card .price{font-size:24px;font-weight:bold;margin:8px 0}
-.card .change{font-size:14px}
-.up{color:#00ff88}.down{color:#ff4444}
-.chart-box{background:#151a26;padding:20px;border-radius:15px;margin-top:15px}
-.chart-box h2{margin-bottom:10px}
-.chart-box h2 span{color:#00ff88}
-canvas{width:100%!important;height:300px!important}
-.footer{text-align:center;color:#555;margin-top:20px;font-size:12px}
+.box{background:#151a26;border-radius:15px;margin:15px;overflow:hidden;padding:10px}
+.box h2{padding:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+.mini{height:150px}
+.main-chart{height:500px;width:100%}
+.footer{text-align:center;color:#555;margin:20px;font-size:12px}
 </style>
 </head>
 <body>
 <div class="header">
-<h1>💰 FinSight MASSIVE</h1>
-<p>Live Markets • Charts • Search Any Stock</p>
-<p style="color:#00ff88;font-size:12px">● LIVE - Updates every 30 seconds</p>
+<h1>💰 FinSight</h1>
+<p>Live Markets • Powered by TradingView</p>
+<p style="color:#00ff88;font-size:12px">● REAL LIVE DATA - No Loading Issues</p>
+</div>
+<div class="tradingview-widget-container">
+<div class="tradingview-widget-container__widget"></div>
+<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+{
+"symbols": [
+{"proName": "FOREXCOM:SPXUSD","title": "S&P 500"},
+{"proName": "FOREXCOM:NSXUSD","title": "US 100"},
+{"proName": "FX_IDC:EURUSD","title": "EUR to USD"},
+{"proName": "BITSTAMP:BTCUSD","title": "Bitcoin"},
+{"proName": "BITSTAMP:ETHUSD","title": "Ethereum"},
+{"proName": "TVC:GOLD","title": "Gold"},
+{"proName": "TVC:USOIL","title": "Oil"},
+{"proName": "NASDAQ:AAPL","title": "Apple"},
+{"proName": "NASDAQ:TSLA","title": "Tesla"},
+{"proName": "NASDAQ:NVDA","title": "Nvidia"}
+],
+"showSymbolLogo": true,
+"colorTheme": "dark",
+"isTransparent": false,
+"displayMode": "adaptive",
+"locale": "en"
+}
+</script>
 </div>
 <div class="search-box">
-<input id="searchInput" placeholder="Search any stock... e.g. TSLA, NVDA, MSFT, AMZN, META" value="AAPL">
-<button onclick="searchStock()">🔍 SEARCH</button>
+<input id="searchInput" placeholder="Type symbol... e.g. TSLA, NVDA, BTCUSD" value="AAPL">
+<button onclick="changeSymbol()">🔍 LOAD CHART</button>
 </div>
 <div class="quick">
-<button onclick="quickSearch('AAPL')">Apple</button>
-<button onclick="quickSearch('TSLA')">Tesla</button>
-<button onclick="quickSearch('NVDA')">Nvidia</button>
-<button onclick="quickSearch('MSFT')">Microsoft</button>
-<button onclick="quickSearch('AMZN')">Amazon</button>
-<button onclick="quickSearch('GOOGL')">Google</button>
-<button onclick="quickSearch('META')">Meta</button>
-<button onclick="quickSearch('NFLX')">Netflix</button>
-<button onclick="quickSearch('BTC-USD')">Bitcoin</button>
-<button onclick="quickSearch('GC=F')">Gold</button>
+<button onclick="setSym('NASDAQ:AAPL','Apple')">Apple</button>
+<button onclick="setSym('NASDAQ:TSLA','Tesla')">Tesla</button>
+<button onclick="setSym('NASDAQ:NVDA','Nvidia')">Nvidia</button>
+<button onclick="setSym('NASDAQ:MSFT','Microsoft')">Microsoft</button>
+<button onclick="setSym('NASDAQ:AMZN','Amazon')">Amazon</button>
+<button onclick="setSym('NASDAQ:GOOGL','Google')">Google</button>
+<button onclick="setSym('NASDAQ:META','Meta')">Meta</button>
+<button onclick="setSym('NASDAQ:NFLX','Netflix')">Netflix</button>
+<button onclick="setSym('BITSTAMP:BTCUSD','Bitcoin')">Bitcoin</button>
+<button onclick="setSym('TVC:GOLD','Gold')">Gold</button>
+<button onclick="setSym('TVC:USOIL','Oil')">Oil</button>
+<button onclick="setSym('OANDA:XAUUSD','Gold Spot')">Gold Spot</button>
 </div>
-<div class="grid" id="cards"></div>
-<div class="chart-box">
-<h2>📈 <span id="chartTitle">AAPL</span> - Live Chart</h2>
-<p id="chartInfo" style="color:#888;margin-bottom:10px">Loading...</p>
-<canvas id="mainChart"></canvas>
+<div class="box">
+<h2>📈 <span id="chartTitle">Apple - AAPL</span> - Live TradingView Chart</h2>
+<div id="tv_chart" class="main-chart"></div>
 </div>
-<div class="chart-box">
-<h2>🥇 Gold (GC=F) - Live Chart</h2>
-<canvas id="goldChart"></canvas>
+<div class="box">
+<h2>🔥 Top Movers - Live Prices</h2>
+<div class="grid">
+<div class="mini" id="w1"></div>
+<div class="mini" id="w2"></div>
+<div class="mini" id="w3"></div>
+<div class="mini" id="w4"></div>
+<div class="mini" id="w5"></div>
+<div class="mini" id="w6"></div>
 </div>
+</div>
+<div class="box">
+<h2>🥇 Gold - Live</h2>
+<div id="tv_gold" style="height:350px"></div>
+</div>
+<div class="footer">FinSight • Data by TradingView • Not financial advice</div>
 <script>
-let mainChart=null, goldChart=null;
-const symbols = [
- {sym:"GC=F", name:"Gold"},
- {sym:"CL=F", name:"Oil"},
- {sym:"^GSPC", name:"S&P 500"},
- {sym:"AAPL", name:"Apple"},
- {sym:"BTC-USD", name:"Bitcoin"},
- {sym:"TSLA", name:"Tesla"},
-];
-async function fetchYahoo(sym){
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=5m`;
-  const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  try{
-    const r = await fetch(proxy);
-    const j = await r.json();
-    const res = j.chart.result[0];
-    const meta = res.meta;
-    const prices = res.indicators.quote[0].close.filter(v=>v!==null);
-    const times = res.timestamp.map(t=>new Date(t*1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
-    return {price: meta.regularMarketPrice, prev: meta.previousClose, change: ((meta.regularMarketPrice-meta.previousClose)/meta.previousClose*100), prices, times, name: meta.longName || sym};
-  }catch(e){ return null; }
-}
-async function loadCards(){
-  const grid = document.getElementById('cards');
-  grid.innerHTML = symbols.map(s=>`<div class="card"><h3>${s.name} (${s.sym})</h3><div class="price">Loading...</div><div class="change">...</div></div>`).join('');
-  const cards = grid.children;
-  for(let i=0;i<symbols.length;i++){
-    const d = await fetchYahoo(symbols[i].sym);
-    if(d){
-      const cls = d.change>=0?'up':'down';
-      const arrow = d.change>=0?'▲':'▼';
-      cards[i].querySelector('.price').textContent = '$' + d.price.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
-      cards[i].querySelector('.change').innerHTML = `<span class="${cls}">${arrow} ${Math.abs(d.change).toFixed(2)}%</span> • Prev $${d.prev.toFixed(2)}`;
-    } else {
-      cards[i].querySelector('.price').textContent = 'Retrying...';
-    }
-  }
-}
-function drawChart(canvasId, chartObj, labels, data, color){
-  const ctx = document.getElementById(canvasId).getContext('2d');
-  if(chartObj) chartObj.destroy();
-  return new Chart(ctx,{
-    type:'line',
-    data:{labels:labels, datasets:[{data:data, borderColor:color, backgroundColor:color+'22', fill:true, tension:0.4, pointRadius:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888',maxTicksLimit:6}},y:{ticks:{color:'#888'}}}}
+let widget=null;
+function createChart(symbol){
+  if(widget) widget.remove();
+  widget = new TradingView.widget({
+    "autosize": true,
+    "symbol": symbol,
+    "interval": "D",
+    "timezone": "Africa/Nairobi",
+    "theme": "dark",
+    "style": "1",
+    "locale": "en",
+    "enable_publishing": false,
+    "allow_symbol_change": true,
+    "container_id": "tv_chart"
   });
 }
-async function loadMain(sym){
-  document.getElementById('chartTitle').textContent = sym;
-  const d = await fetchYahoo(sym);
-  if(!d){ document.getElementById('chartInfo').textContent='Failed to load. Try again.'; return; }
-  const cls = d.change>=0?'▲':'▼';
-  document.getElementById('chartInfo').innerHTML = `<b style="color:white;font-size:20px">$${d.price.toFixed(2)}</b> <span style="color:${d.change>=0?'#00ff88':'#ff4444'}">${cls} ${d.change.toFixed(2)}%</span> • ${d.name}`;
-  mainChart = drawChart('mainChart', mainChart, d.times, d.prices, d.change>=0?'#00ff88':'#ff4444');
+function createMini(id, symbol){
+  new TradingView.widget({
+    "autosize": true,
+    "symbol": symbol,
+    "interval": "D",
+    "timezone": "Africa/Nairobi",
+    "theme": "dark",
+    "style": "1",
+    "locale": "en",
+    "enable_publishing": false,
+    "hide_top_toolbar": true,
+    "hide_legend": false,
+    "container_id": id
+  });
 }
-async function loadGold(){
-  const d = await fetchYahoo('GC=F');
-  if(!d) return;
-  goldChart = drawChart('goldChart', goldChart, d.times, d.prices, '#FFD700');
-}
-function searchStock(){
-  const v = document.getElementById('searchInput').value.trim().toUpperCase();
-  if(v) loadMain(v);
-}
-function quickSearch(sym){
+function setSym(sym, name){
+  document.getElementById('chartTitle').textContent = name + ' - ' + sym;
   document.getElementById('searchInput').value = sym;
-  loadMain(sym);
+  createChart(sym);
+  window.scrollTo({top: 350, behavior:'smooth'});
 }
-document.getElementById('searchInput').addEventListener('keypress', e=>{ if(e.key==='Enter') searchStock(); });
-async function init(){
-  await loadCards();
-  await loadMain('AAPL');
-  await loadGold();
+function changeSymbol(){
+  let v = document.getElementById('searchInput').value.trim().toUpperCase();
+  if(!v) return;
+  if(v==="BTC"||v==="BTCUSD") v="BITSTAMP:BTCUSD";
+  else if(v==="GOLD"||v==="XAUUSD") v="TVC:GOLD";
+  else if(!v.includes(":")){
+    if(["AAPL","TSLA","NVDA","MSFT","AMZN","GOOGL","META","NFLX","AMD","INTC"].includes(v)) v="NASDAQ:"+v;
+    else v="NASDAQ:"+v;
+  }
+  setSym(v, v);
 }
-init();
-setInterval(()=>{ loadCards(); loadGold(); }, 30000);
+createChart("NASDAQ:AAPL");
+createMini("w1","NASDAQ:AAPL");
+createMini("w2","NASDAQ:TSLA");
+createMini("w3","NASDAQ:NVDA");
+createMini("w4","BITSTAMP:BTCUSD");
+createMini("w5","TVC:GOLD");
+createMini("w6","NASDAQ:MSFT");
+new TradingView.widget({
+  "autosize": true,
+  "symbol": "TVC:GOLD",
+  "interval": "D",
+  "timezone": "Africa/Nairobi",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "enable_publishing": false,
+  "container_id": "tv_gold"
+});
 </script>
 </body>
 </html>
