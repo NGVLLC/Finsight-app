@@ -7,58 +7,39 @@
 <style>
 body{font-family:Arial;background:#0f172a;color:white;margin:0;padding:16px}
 h1{color:#22c55e} .card{background:#1e293b;padding:16px;border-radius:12px;margin:12px 0}
-.price{font-size:28px;font-weight:bold} .up{color:#22c55e} .down{color:#ef4444}
 button{background:#22c55e;border:0;padding:10px 16px;border-radius:8px;font-weight:bold;color:#000}
 small{color:#94a3b8}
+.tradingview-widget-container{margin-top:10px}
 </style>
 </head>
 <body>
 <h1>FinSight 💹</h1>
 <p>Commodities • Stocks • Shares • Indices — Live Insights</p>
-<p><small id="updated">Updating...</small></p>
-<div class="card"><h3>Gold (XAU/USD)</h3><div class="price" id="gold">Loading...</div><p id="gold-insight">Analysing...</p></div>
-<div class="card"><h3>Oil (WTI)</h3><div class="price" id="oil">Loading...</div><p id="oil-insight">Analysing...</p></div>
-<div class="card"><h3>S&P 500</h3><div class="price" id="sp500">Loading...</div><p id="sp500-insight">Analysing...</p></div>
-<div class="card"><h3>Apple (AAPL)</h3><div class="price" id="aapl">Loading...</div><p id="aapl-insight">Analysing...</p></div>
-<div class="card"><h3>Safaricom</h3><div class="price">KES 17.50 <span class="up">+1.2%</span></div><p>Insight: Stable, good for long-term holders in Kenya.</p></div>
-<div class="card"><h3>AI Insight Engine</h3><p id="ai">Loading market summary...</p><button onclick="refresh()">Refresh Data</button></div>
-<script>
-async function getPrice(stooqSym, el, insightEl, name){
-  try{
-    let stooqUrl = `https://stooq.com/q/l/?s=${stooqSym}&f=sd2t2ohlcv&h&e=csv`;
-    let res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(stooqUrl)}`);
-    let text = await res.text();
-    let lines = text.trim().split("\n");
-    let cols = lines[1].split(",");
-    let open = parseFloat(cols[3]);
-    let close = parseFloat(cols[6]);
-    let change = ((close-open)/open*100).toFixed(2);
-    let cls = change >= 0 ? 'up' : 'down';
-    document.getElementById(el).innerHTML = `$${close.toLocaleString()} <span class="${cls}">${change}%</span>`;
-    document.getElementById(insightEl).innerText = change>=0 ? `${name} is trending UP. Momentum is positive.` : `${name} is trending DOWN. Wait for a better entry.`;
-    return parseFloat(change);
-  }catch(e){
-    document.getElementById(el).innerText = "Retrying...";
-    return 0;
-  }
-}
-async function refresh(){
-  document.getElementById("updated").innerText = "Updating live prices...";
-  let g = await getPrice("gc.f","gold","gold-insight","Gold");
-  let o = await getPrice("cl.f","oil","oil-insight","Oil");
-  let s = await getPrice("^spx","sp500","sp500-insight","S&P 500");
-  let a = await getPrice("aapl.us","aapl","aapl-insight","Apple");
-  document.getElementById("updated").innerText = "Last updated: " + new Date().toLocaleTimeString();
-  let msg = "Market Check: ";
-  if(g>0 && s>0) msg += "Gold and Stocks both UP - Risk appetite is HIGH, investors are confident.";
-  else if(g>0 && s<0) msg += "Gold UP, Stocks DOWN - Investors moving to safe assets. Be careful.";
-  else if(g<0 && s>0) msg += "Gold DOWN, Stocks UP - Money moving into stocks. Growth mood.";
-  else msg += "Mixed signals. Wait before making big moves.";
-  if(o>1) msg += " Oil rising fast - inflation pressure up.";
-  document.getElementById("ai").innerText = msg;
-}
-refresh();
-setInterval(refresh, 60000);
-</script>
+<p><small>Live prices powered by TradingView • Updates automatically</small></p>
+
+<div class="card"><h3>Gold (XAU/USD)</h3>
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "OANDA:XAUUSD","width": "100%","isTransparent": true,"colorTheme": "dark","locale": "en"}</script></div>
+<p>Insight: Gold is the safe haven. When it rises, investors are scared. When it falls, investors are confident.</p></div>
+
+<div class="card"><h3>Oil (WTI)</h3>
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "TVC:USOIL","width": "100%","isTransparent": true,"colorTheme": "dark","locale": "en"}</script></div>
+<p>Insight: Oil up = fuel & transport costs up. Oil down = inflation cooling.</p></div>
+
+<div class="card"><h3>S&P 500</h3>
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "SP:SPX","width": "100%","isTransparent": true,"colorTheme": "dark","locale": "en"}</script></div>
+<p>Insight: S&P 500 is the whole US market. If it's up, stocks are healthy.</p></div>
+
+<div class="card"><h3>Apple (AAPL)</h3>
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "NASDAQ:AAPL","width": "100%","isTransparent": true,"colorTheme": "dark","locale": "en"}</script></div>
+<p>Insight: Apple leads tech. When Apple is up, tech is strong.</p></div>
+
+<div class="card"><h3>Bitcoin</h3>
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>{"symbol": "BINANCE:BTCUSDT","width": "100%","isTransparent": true,"colorTheme": "dark","locale": "en"}</script></div>
+<p>Insight: Bitcoin is high risk, high reward. Only invest what you can afford to lose.</p></div>
+
+<div class="card"><h3>Safaricom</h3><div style="font-size:24px;font-weight:bold">KES 17.50 <span style="color:#22c55e">+1.2%</span></div><p>Insight: Stable, good for long-term holders in Kenya.</p></div>
+
+<div class="card"><h3>AI Insight Engine</h3><p>Market Check: If Gold is UP and S&P is DOWN - investors are moving to safe assets, be careful. If Gold is DOWN and S&P is UP - money is moving into stocks, growth mood. If Oil is rising fast - inflation pressure up.</p></div>
+
 </body>
 </html>
